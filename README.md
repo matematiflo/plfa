@@ -55,6 +55,7 @@ ghcup install cabal recommended
 ghcup set ghc 9.4.8
 ghcup set cabal recommended
 ```
+
 or using `ghcup tui` and choosing to `set` the appropriate tools.
 
 ### Install Agda
@@ -230,13 +231,17 @@ If you're having trouble typing the Unicode characters into Emacs, the end of ea
 
 Emacs with `agda-mode` offers a number of useful commands, and two of them are especially useful when it comes to working with Unicode characters. For a full list of supported characters, use `agda-input-show-translations` with:
 
-    M-x agda-input-show-translations
+```agda
+M-x agda-input-show-translations
+```
 
 All the supported characters in `agda-mode` are shown.
 
 If you want to know how you input a specific Unicode character in agda file, move the cursor onto the character and type the following command:
 
-    M-x quail-show-key
+```agda
+M-x quail-show-key
+```
 
 You'll see the key sequence of the character in mini buffer.
 
@@ -265,7 +270,6 @@ If you plan to build PLFA locally, please refer to [Contributing][plfa-contribut
 [agda-stdlib-version-svg]: https://img.shields.io/badge/agda--stdlib-v1.7.2-blue.svg
 [agda-stdlib-version-url]: https://github.com/agda/agda-stdlib/releases/tag/v1.7.2
 [plfa]: https://plfa.inf.ed.ac.uk
-[plfa-epub]: https://plfa.github.io/plfa.epub
 [plfa-contributing]: https://plfa.github.io/Contributing/
 [ghcup]: https://www.haskell.org/ghcup/
 [git]: https://git-scm.com/downloads
@@ -288,4 +292,3 @@ If you plan to build PLFA locally, please refer to [Contributing][plfa-contribut
 [font-dejavusansmono]: https://dejavu-fonts.github.io/
 [font-freemono]: https://www.gnu.org/software/freefont/
 [font-mononoki]: https://madmalik.github.io/mononoki/
-[font-mononoki-debian]: https://packages.debian.org/sid/fonts/fonts-mononoki
