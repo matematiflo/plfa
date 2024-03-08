@@ -719,7 +719,15 @@ first four days using a finite story of creation, as
 
 ```agda
 -- Your code goes here
+-- 0 : ℕ
+-- 1 : ℕ    (0 + 0) + 0 = 0 + (0 + 0)
+-- 2 : ℕ    (0 + 0) + 1 = 0 + (0 + 1)   (0 + 1) + 0 = 0 + (1 + 0)   (0 + 1) + 1 = 0 + (1 + 1)   (1 + 0) + 0 = 1 + (0 + 0)   (1 + 0) + 1 = 1 + (0 + 1)   (1 + 1) + 0 = 1 + (1 + 0)   (1 + 1) + 1 = 1 + (1 + 1)    
+-- 3 : ℕ    (0 + 0) + 2 = 0 + (0 + 2)   (0 + 2) + 0 = 0 + (2 + 0)   (0 + 2) + 1 = 0 + (2 + 1)   (0 + 2) + 2 = 0 + (2 + 2)   ...
 ```
+
+On the _(n + 1)_'th day there will be _(n + 1)_ distinct natural numbers, and _(6 ^ (n + 1) - (5 * n) - 6) / 25_ equations about associativity...
+More importantly, on the _(n + 1)_'th day, there are _(6 ^ (n+1) - 1) / 5_ *new* equations about associativity...
+This is obtained by saying that that, if we denote by _u n_ the number of new equations on Day _n + 1_, then _u 0 = 0_ and _u (n + 1) = 6 * u n + 1_ because, to count how many new equations we get, we take the new number and insert either 1, 2 or 3 copies of it in all the preceding associativity equations... if we insert 1 or 2 copies, there are three possibilities to place those in the three available spots, and if we insert three copies, there is only possibility, so _u (n + 1) = 3 * u n + 3 * u n + 1 = 6 u n + 1_. This gives _u n = (6 ^ (n + 1) - 1) / 5_ and _sum k 0 n u k = (6 ^ (n + 1) - (5 * n) - 6) / 25_ ...
 
 ## Associativity with rewrite
 
@@ -891,6 +899,8 @@ is associative and commutative.
 
 ```agda
 -- Your code goes here
+swap : ∀ (m n p : ℕ) → m + (n + p) ≡ n + (m + p)
+swap m n p rewrite sym (+-assoc m n p) | +-comm m n | +-assoc n m p = refl
 ```
 
 
@@ -904,8 +914,16 @@ for all naturals `m`, `n`, and `p`.
 
 ```agda
 -- Your code goes here
+*-distrib-+ : ∀ (m n p : ℕ) → (m + n) * p ≡ m * p + n * p  
+*-distrib-+ zero n p = refl
+*-distrib-+ (suc m) n p rewrite *-distrib-+ m n p | +-assoc p (m * p) (n * p) = refl 
 ```
 
+```agda
+*-leftDistrib-+ : ∀ (m n p : ℕ) → m * (n + p) ≡ m * n + m * p 
+*-leftDistrib-+ zero n p = refl
+*-leftDistrib-+ (suc m) n p rewrite *-leftDistrib-+ m n p | +-assoc n p (m * n + m * p) | sym (+-assoc p (m * n) (m * p)) | +-comm p (m * n) | +-assoc (m * n) p (m * p) | sym (+-assoc n (m * n) (p + (m * p))) = refl 
+```
 
 #### Exercise `*-assoc` (recommended) {#times-assoc}
 
@@ -917,6 +935,9 @@ for all naturals `m`, `n`, and `p`.
 
 ```agda
 -- Your code goes here
+*-assoc : ∀ (m n p : ℕ) → (m * n) * p ≡ m * (n * p) 
+*-assoc zero n p = refl
+*-assoc (suc m) n p rewrite *-distrib-+ n (m * n) p | sym (*-assoc m n p) = refl 
 ```
 
 
@@ -931,8 +952,36 @@ you will need to formulate and prove suitable lemmas.
 
 ```agda
 -- Your code goes here
-```
+*-right-abs : ∀ (n : ℕ) → n * 0 ≡ 0 
+*-right-abs zero = refl
+*-right-abs (suc n) rewrite *-right-abs n = refl 
 
+*-right-unit : ∀ (n : ℕ) → n * 1 ≡ n 
+*-right-unit zero = refl
+*-right-unit (suc n) rewrite *-right-unit n = refl 
+
+*-comm : ∀ (m n : ℕ) → m * n ≡ n * m 
+*-comm m zero rewrite *-right-abs m = refl
+*-comm m (suc n) rewrite *-leftDistrib-+ m 1 n | *-right-unit m | *-comm m n = refl 
+
+*-comm' : ∀ (m n : ℕ) → m * n ≡ n * m 
+*-comm' zero n rewrite *-right-abs n = refl
+*-comm' (suc m) n rewrite *-comm m n | *-leftDistrib-+ n 1 m | *-right-unit n = refl
+
++-right-unit : ∀ (n : ℕ) → n + 0 ≡ n 
++-right-unit zero = refl
++-right-unit (suc n) rewrite +-right-unit n = refl
+ 
+*-left-unit : ∀ (n : ℕ) → 1 * n ≡ n 
+*-left-unit zero rewrite *-right-abs 1 = refl
+*-left-unit (suc n) rewrite +-right-unit n = refl 
+
+test : ∀ (n : ℕ) → n + 0 ≡ 0 + n 
+test m rewrite +-right-unit m = refl
+
+test' : ∀ (n : ℕ) → 0 + n ≡ n
+test' n = refl 
+```
 
 #### Exercise `0∸n≡0` (practice) {#zero-monus}
 

@@ -79,6 +79,8 @@ Write out `7` in longhand.
 
 ```agda
 -- Your code goes here
+seven : ℕ 
+seven = suc (suc (suc (suc (suc (suc (suc zero))))))
 ```
 
 You will need to give both a type signature and definition for the
@@ -438,6 +440,22 @@ Compute `3 + 4`, writing out your reasoning as a chain of equations, using the e
 
 ```agda
 -- Your code goes here
+_ : 3 + 4 ≡ 7 
+-- _ = refl 
+_ = 
+  begin
+    3 + 4
+  ≡⟨⟩
+    suc (2 + 4)
+  ≡⟨⟩
+    suc (suc (1 + 4))
+  ≡⟨⟩
+    suc (suc (suc (0 + 4)))
+  ≡⟨⟩
+    suc (suc (suc 4))
+  ≡⟨⟩
+    7
+  ∎
 ```
 
 
@@ -500,8 +518,27 @@ Compute `3 * 4`, writing out your reasoning as a chain of equations, using the e
 
 ```agda
 -- Your code goes here
+_ : 3 * 4 ≡ 12
+-- _ = refl 
+_ = 
+  begin
+   3 * 4
+  ≡⟨⟩
+   4 + (2 * 4)
+  ≡⟨⟩
+   4 + (4 + (1 * 4))
+  ≡⟨⟩
+   4 + (4 + (4 + (0 * 4)))
+  ≡⟨⟩
+   4 + (4 + (4 + 0))
+  ≡⟨⟩
+   4 + (4 + 4)
+  ≡⟨⟩
+   4 + 8
+  ≡⟨⟩
+   12
+  ∎
 ```
-
 
 #### Exercise `_^_` (recommended) {#power}
 
@@ -514,6 +551,33 @@ Check that `3 ^ 4` is `81`.
 
 ```agda
 -- Your code goes here
+_^_  : ℕ → ℕ → ℕ
+m ^ zero = 1
+m ^ suc n = m * (m ^ n)
+
+_ : 3 ^ 4 ≡ 81
+_ = refl 
+  -- begin 
+  --  3 ^ 4
+  -- ≡⟨⟩
+  --  3 * (3 ^ 3)
+  -- ≡⟨⟩
+  --  3 * (3 * (3 ^ 2))
+  -- ≡⟨⟩
+  --  3 * (3 * (3 * (3 ^ 1)))
+  -- ≡⟨⟩
+  --  3 * (3 * (3 * (3 * (3 ^ 0))))
+  -- ≡⟨⟩
+  --  3 * (3 * (3 * (3 * 1)))
+  -- ≡⟨⟩
+  --  3 * (3 * (3 * 3))
+  -- ≡⟨⟩
+  --  3 * (3 * 9)
+  -- ≡⟨⟩
+  --  3 * 27
+  -- ≡⟨⟩
+  --  81
+  -- ∎
 ```
 
 
@@ -598,7 +662,6 @@ Compute `5 ∸ 3` and `3 ∸ 5`, writing out your reasoning as a chain of equati
 ```agda
 -- Your code goes here
 ```
-
 
 ## Precedence
 
@@ -767,11 +830,13 @@ You've got the hang of it by now:
     0 : ℕ
     1 : ℕ    0 + 0 = 0
     2 : ℕ    0 + 1 = 1   1 + 0 = 1
-    3 : ℕ    0 + 2 = 2   1 + 1 = 2    2 + 0 = 2
+    3 : ℕ    0 + 2 = 2   1 + 1 = 2   2 + 0 = 2
+    4 : ℕ    0 + 3 = 3   1 + 2 = 3   2 + 1 = 3   3 + 0 = 3
+    5 : ℕ    0 + 4 = 4   1 + 3 = 4   2 + 2 = 4   3 + 1 = 4   4 + 0 = 4
 
-On the _n_'th day there will be _n_ distinct natural numbers, and
-_n × (n-1) / 2_ equations about addition.  The number _n_ and all equations
-for addition of numbers less than _n_ first appear by day _n+1_.
+On the _(n + 1)_'th day there will be _(n + 1)_ distinct natural numbers, and
+_(n + 1) × n / 2_ equations about addition.  The number _n_ and all _n_ equations
+for addition of numbers less than _n_ first appear by day _n+1_ (meaning that we have _1_ *new* number and _n_ *new* equations about addition appearing on Day _n + 1_).
 This gives an entirely finitist view of infinite sets of data and
 equations relating the data.
 
