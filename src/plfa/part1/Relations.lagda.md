@@ -15,10 +15,10 @@ the next step is to define relations, such as _less than or equal_.
 ```agda
 import Relation.Binary.PropositionalEquality as Eq
 open Eq using (_≡_; refl; cong)
-open import Data.Nat using (ℕ; zero; suc; _+_)
-open import Data.Nat.Properties using (+-comm; +-identityʳ)
+open Eq.≡-Reasoning using (begin_; _≡⟨⟩_; step-≡; _∎)
+open import Data.Nat using (ℕ; zero; suc; _+_; _*_)
+open import Data.Nat.Properties using (+-comm; +-identityʳ; *-comm)
 ```
-
 
 ## Defining relations
 
@@ -43,6 +43,7 @@ definition as a pair of inference rules:
         suc m ≤ suc n
 
 And here is the definition in Agda:
+
 ```agda
 data _≤_ : ℕ → ℕ → Set where
 
@@ -55,6 +56,7 @@ data _≤_ : ℕ → ℕ → Set where
       -------------
     → suc m ≤ suc n
 ```
+
 Here `z≤n` and `s≤s` (with no spaces) are constructor names, while
 `zero ≤ n`, and `m ≤ n` and `suc m ≤ suc n` (with spaces) are types.
 This is our first use of an _indexed_ datatype, where the type `m ≤ n`
@@ -201,8 +203,63 @@ inv-z≤n : ∀ {m : ℕ}
   → m ≤ zero
     --------
   → m ≡ zero
-inv-z≤n z≤n = refl
+-- inv-z≤n z≤n = refl  -- Official answer from **PLFA** 
+inv-z≤n {m} z≤n = refl
+-- inv-z≤n .{zero} (z≤n) = refl 
+-- inv-z≤n {zero} (z≤n) = refl 
+-- inv-z≤n .{_} (z≤n) = refl 
+-- inv-z≤n {_} (z≤n) = refl 
+{- 
+inv-z≤n {m} z≤n = 
+  begin
+    m
+  ≡⟨⟩
+    zero
+  ∎ 
+ -}
+{- 
+inv-z≤n {zero} z≤n = 
+  begin
+    zero 
+  ≡⟨⟩
+    zero
+  ∎ 
+ -}
+{- 
+inv-z≤n z≤n = 
+  begin
+    zero 
+  ≡⟨⟩
+    zero
+  ∎
+ -}
+ 
+inv-z≤n' : {m : ℕ} → {p : m ≤ zero} → m ≡ zero  -- if one declares it like this, then, starting from `inv-z≤n' = ?` and, after querying the proof state with `C-c C-l`, using the case split command `C-C C-c` twice to put `m` and `p`in scope, then using it again to case split on `p` changes the goal to `inv-z≤n' {.zero} {z≤n} = {!   !}`.
+inv-z≤n' {.zero} {z≤n} = refl 
+
+-- In the end, the most natural thing seems to be: start like this
+-- inv-z≤n'' : {m : ℕ} → (m ≤ zero) → m ≡ zero 
+-- inv-z≤n'' {m} p = ? 
+-- and then case split on `p`
+
+inv-z≤n'' : {m : ℕ} → (p : m ≤ zero) → m ≡ zero 
+inv-z≤n'' {.zero} z≤n = refl  
+
+-- One can also start like this  
+-- inv-z≤n''' : {m : ℕ} → (m ≤ zero) → m ≡ zero  
+-- inv-z≤n''' = ?  
+-- then case split *on the goal* (by entering nothing as a variable) and then (after a `C-c C-,`), case split again on `x : z≤n`  
+
+inv-z≤n''' : {m : ℕ} → (m ≤ zero) → m ≡ zero  
+inv-z≤n''' z≤n = refl  
 ```
+
+See also [James McKinna's answer](https://stackoverflow.com/a/78131746/22005810) on Stackoverflow:
+
+There's maybe the additional meta-level *why?* as to "why is such reasoning sound in the first place?" which touches on our willingness to accept proof by induction on complicated inductive definitions, and the justification of dependently-typed pattern-matching as a mechanism to instrument such reasoning (and unification along with it as the means by which we can say what form(s) `m` must take in the course of such reasoning)... but
+
+- that (perhaps) takes us too philosophically far off-topic, but is always part of the justification for type theory, and how we come to have confidence in such arguments, as well as the distinguished role played by definitional equality 'in the background';
+- we are already working in an implementation of type theory, so such niceties might already be considered to be 'taken as read' as part of our presupposed epistemological commitment to using Agda in the first place... ;-)
 
 ## Properties of ordering relations
 
@@ -264,7 +321,18 @@ as that will make it easier to invoke reflexivity:
   → n ≤ n
 ≤-refl {zero} = z≤n
 ≤-refl {suc n} = s≤s ≤-refl
+
+-- Having `n` as an implicit parameter has the effect that the case split command `C-c C-c` applied on `n` (not in scope) puts `n` in scope and changes the local context `≤-refl'' = {!   !}` to `≤-refl'' {n} = {!   !}`, then a second case split on `n` sets up the induction. When `n` is passed as an explicit parameter, this does not work and `C-c C-r` changes the goal (which is `(n : ℕ) → n ≤ n`) to `≤-refl' = λ n → {!   !}` instead `, after which `C-c C-c` cannot be applied to `n` (bound variable). So, when `n` is passed an explicit parameter, if one wants to use induction, one should start with `≤-refl n = ?` in the definition. Alternately, one could also get to that state by writing `≤-refl = ?` then do a case split *on the goal*.
+
+≤-refl' : (n : ℕ) → n ≤ n  -- with `n` as an explicit parameter 
+≤-refl' zero = z≤n
+≤-refl' (suc n) = s≤s (≤-refl' n) 
+
+≤-refl'' : {n : ℕ} → n ≤ n  -- try again with `n` as an implicit parameter
+≤-refl'' {zero} = z≤n
+≤-refl'' {suc n} = s≤s ≤-refl'' 
 ```
+
 The proof is a straightforward induction on the implicit argument `n`.
 In the base case, `zero ≤ zero` holds by `z≤n`.  In the inductive
 case, the inductive hypothesis `≤-refl {n}` gives us a proof of `n ≤
@@ -319,7 +387,7 @@ One might argue that this is clearer or one might argue that the extra
 length obscures the essence of the proof.  We will usually opt for
 shorter proofs.
 
-The technique of induction on evidence that a property holds (e.g.,
+> The technique of induction on evidence that a property holds (e.g.,
 inducting on evidence that `m ≤ n`)---rather than induction on
 values of which the property holds (e.g., inducting on `m`)---will turn
 out to be immensely valuable, and one that we use often.
@@ -327,6 +395,20 @@ out to be immensely valuable, and one that we use often.
 Again, it is a good exercise to prove transitivity interactively in Emacs,
 using holes and the `C-c C-c`, `C-c C-,`, and `C-c C-r` commands.
 
+-- Let's try it interactively! I get the following:  
+-- (the key *is* to do induction on *evidence* that `m ≤ n`)
+
+```agda
+≤-trans'' : {m n p : ℕ} → m ≤ n → n ≤ p → m ≤ p
+≤-trans'' z≤n x₁ = z≤n
+≤-trans'' (s≤s x) (s≤s x₁) = s≤s (≤-trans'' x x₁) 
+```
+
+-- For the record, this was the first solution above (identical except for some parameter names):  
+-- ≤-trans z≤n       _          =  z≤n
+-- ≤-trans (s≤s m≤n) (s≤s n≤p)  =  s≤s (≤-trans m≤n n≤p)
+
+-- Again, -- the key *is* to do induction on evidence that `m ≤ n` and then again `n ≤ p`!!!
 
 ## Anti-symmetry
 
@@ -362,7 +444,11 @@ The above proof omits cases where one argument is `z≤n` and one
 argument is `s≤s`.  Why is it ok to omit them?
 
 ```agda
+-- Because if the evidence for `m ≤ n`, say, is of the form `0≤n` then it means that `m ≡ 0`, but then evidence for `n ≤ m` is evidence for `n ≤ 0`, which cannot be of the form `s≤s`.
 -- Your code goes here
+≤-antisym' : {m n : ℕ} → m ≤ n → n ≤ m → m ≡ n
+≤-antisym' z≤n z≤n = refl
+≤-antisym' (s≤s x) (s≤s x₁) = cong suc (≤-antisym' x x₁)   
 ```
 
 
@@ -410,8 +496,8 @@ data Total′ : ℕ → ℕ → Set where
       ----------
     → Total′ m n
 ```
-Each parameter of the type translates as an implicit parameter of each
-constructor.  Unlike an indexed datatype, where the indexes can vary
+**Each parameter of the type translates as an implicit parameter of each constructor** (**IMPORTANT BECAUSE TRUE IN GENERAL**).  
+Unlike an indexed datatype, where the indexes can vary
 (as in `zero ≤ n` and `suc m ≤ suc n`), in a parameterised datatype
 the parameters must always be the same (as in `Total m n`).
 Parameterised declarations are shorter, easier to read, and
@@ -455,6 +541,17 @@ This is our first use of the `with` clause in Agda.  The keyword
 Each line begins with an ellipsis (`...`) and a vertical bar (`|`),
 followed by a pattern to be matched against the expression
 and the right-hand side of the equation.
+
+
+```agda
+-- Let's practice (don't know how to this interactively... actually, same problem with rewrite?)
+≤-total'' : (m n : ℕ) → Total m n
+≤-total'' zero n = forward z≤n
+≤-total'' (suc m) zero = flipped z≤n
+≤-total'' (suc m) (suc n) with ≤-total'' m n 
+... | forward x  =  forward (s≤s x)
+... | flipped y  =  flipped (s≤s y)
+```
 
 Every use of `with` is equivalent to defining a helper function.  For
 example, the definition above is equivalent to the following:
@@ -553,6 +650,28 @@ Show that multiplication is monotonic with regard to inequality.
 
 ```agda
 -- Your code goes here
+×-monoʳ-≤ : (n p q : ℕ) → p ≤ q → n * p ≤ n * q  
+×-monoʳ-≤ zero p q x = z≤n
+×-monoʳ-≤ (suc n) p q x = ≤-trans {p + n * p} {q + n * p} {q + n * q} ineq₁ ineq₂ 
+ where  
+ ineq₁ : p + n * p ≤ q + n * p
+ ineq₁ = +-monoˡ-≤ p q (n * p) x  
+ ineq₂ : q + n * p ≤ q + n * q  
+ ineq₂ = +-monoʳ-≤ q (n * p) (n * q) ih  
+  where  
+  ih : n * p ≤ n * q  
+  ih = (×-monoʳ-≤ n p q x)  
+-- To review and to complete...
+×-monoˡ-≤ : (m n p : ℕ) → m ≤ n → m * p ≤ n * p  
+×-monoˡ-≤ n m p x rewrite *-comm m p | *-comm n p = ×-monoʳ-≤ p n m x
+
+×-mono : (m n p q : ℕ) → m ≤ n → p ≤ q → m * p ≤ n * q  
+×-mono m n p q x y = ≤-trans {m * p} {n * p} {n * q} ineq₁ ineq₂ 
+ where  
+ ineq₁ : m * p ≤ n * p  
+ ineq₁ = ×-monoˡ-≤ m n p x  
+ ineq₂ : n * p ≤ n * q  
+ ineq₂ = ×-monoʳ-≤ n p q y 
 ```
 
 
@@ -589,7 +708,7 @@ requires negation, as does the fact that the three cases in
 trichotomy are mutually exclusive, so those points are deferred to
 Chapter [Negation](/Negation/).
 
-It is straightforward to show that `suc m ≤ n` implies `m < n`,
+It is straightforward to show that `suc m ≤ n` implies `m < n`,   -- **TO-DO** --
 and conversely.  One can then give an alternative derivation of the
 properties of strict inequality, such as transitivity, by
 exploiting the corresponding properties of inequality.
@@ -841,3 +960,4 @@ This chapter uses the following unicode:
 
 The commands `\^l` and `\^r` give access to a variety of superscript
 leftward and rightward arrows in addition to superscript letters `l` and `r`.
+ 

@@ -79,7 +79,6 @@ Give an example of an operator that has an identity and is
 associative but is not commutative.
 (You do not have to prove these properties.)
 
-
 ## Associativity
 
 One property of addition is that it is _associative_, that is, that the
@@ -357,7 +356,6 @@ proof of associativity.
   ∎
 ```
 
-
 ## Terminology and notation
 
 The symbol `∀` appears in the statement of associativity to indicate that
@@ -391,8 +389,6 @@ and
     _+_ : ∀ (m : ℕ) → ∀ (n : ℕ) → ℕ
 
 are all equivalent.
-
-
 
 ## Our second proof: commutativity
 
@@ -503,6 +499,7 @@ Here is the lemma's statement and proof:
     suc (suc m + n)
   ∎
 ```
+
 The signature states that we are defining the identifier `+-suc` which provides
 evidence for the proposition:
 
@@ -628,6 +625,7 @@ Here is an example:
     (m + (n + p)) + q
   ∎
 ```
+
 No induction is required, we simply apply associativity twice.
 A few points are worthy of note.
 
@@ -659,8 +657,6 @@ into the equation:
 
 Similarly, we write `(x +_)` for the function that applied to `y`
 returns `x + y`; the same works for any infix operator.
-
-
 
 ## Creation, one last time
 
@@ -769,6 +765,11 @@ rewriting by the inductive hypothesis our goal becomes
 and the proof is again given by `refl`.  Rewriting avoids
 not only chains of equations but also the need to invoke `cong`.
 
+```agda
++-assocbis : (m n p : ℕ) → (m + n) + p ≡ m + (n + p)
++-assocbis zero n p = refl
++-assocbis (suc m) n p rewrite +-assocbis m n p = refl
+```
 
 ## Commutativity with rewrite
 
@@ -902,7 +903,6 @@ is associative and commutative.
 swap : (m n p : ℕ) → m + (n + p) ≡ n + (m + p)
 swap m n p rewrite sym (+-assoc m n p) | +-comm m n | +-assoc n m p = refl
 ```
-
 
 #### Exercise `*-distrib-+` (recommended) {#times-distrib-plus}
 
