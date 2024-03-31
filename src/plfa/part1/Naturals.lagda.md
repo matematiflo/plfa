@@ -15,7 +15,6 @@ But the number of stars is finite, while natural numbers are infinite.
 Count all the stars, and you will still have as many natural numbers
 left over as you started with.
 
-
 ## The naturals are an inductive datatype
 
 Everyone is familiar with the natural numbers
@@ -86,7 +85,6 @@ seven = suc (suc (suc (suc (suc (suc (suc zero))))))
 You will need to give both a type signature and definition for the
 variable `seven`. Type `C-c C-l` in Emacs to instruct Agda to re-load.
 
-
 ## Unpacking the inference rules
 
 Let's unpack the inference rules.  Each inference rule consists of
@@ -97,7 +95,6 @@ and the conclusion asserts that `zero` is a natural.  The second rule
 is the inductive case. It has one hypothesis, which assumes that `m`
 is a natural, and the conclusion asserts that `suc m`
 is also a natural.
-
 
 ## Unpacking the Agda definition
 
@@ -126,7 +123,6 @@ They are symbols in _unicode_.  At the end of each chapter is a list
 of all unicode symbols introduced in the chapter, including
 instructions on how to type them in the Emacs text editor.  Here
 _type_ refers to typing with fingers as opposed to data types!
-
 
 ## The story of creation
 
@@ -208,7 +204,6 @@ we would have no numbers in the beginning, and still no numbers on the
 second day, and on the third, and so on.  An inductive definition lacking
 a base case is useless, as in the phrase "Brexit means Brexit".
 
-
 ## Philosophy and history
 
 A philosopher might observe that our reference to the first day,
@@ -226,7 +221,6 @@ und was sollen die Zahlen?_" (What are and what should be the
 numbers?), published in 1888, and Giuseppe Peano's book "_Arithmetices
 principia, nova methodo exposita_" (The principles of arithmetic
 presented by a new method), published the following year.
-
 
 ## A pragma
 
@@ -252,7 +246,6 @@ type for arbitrary-precision integers.  Representing the natural _n_
 with `zero` and `suc` requires space proportional to _n_, whereas
 representing it as an arbitrary-precision integer in Haskell only
 requires space proportional to the logarithm of _n_.
-
 
 ## Imports
 
@@ -287,7 +280,6 @@ term), and `_∎` is postfix (it is written after a term).
 
 Parentheses and semicolons are among the few characters that cannot
 appear in names, so we do not need extra spaces in the `using` list.
-
 
 ## Operations on naturals are recursive functions {#plus}
 
@@ -348,6 +340,7 @@ addition of larger numbers is defined in terms of addition of smaller
 numbers.  Such a definition is called _well founded_.
 
 For example, let's add two and three:
+
 ```agda
 _ : 2 + 3 ≡ 5
 _ =
@@ -365,8 +358,10 @@ _ =
     5
   ∎
 ```
+
 We can write the same derivation more compactly by only
 expanding shorthand as needed:
+
 ```agda
 _ : 2 + 3 ≡ 5
 _ =
@@ -382,6 +377,7 @@ _ =
     5
   ∎
 ```
+
 The first line matches the inductive case by taking `m = 1` and `n = 3`,
 the second line matches the inductive case by taking `m = 0` and `n = 3`,
 and the third line matches the base case by taking `n = 3`.
@@ -407,10 +403,12 @@ definition of that symbol.
 
 In fact, both proofs above are longer than need be, and Agda is satisfied
 with the following:
+
 ```agda
 _ : 2 + 3 ≡ 5
 _ = refl
 ```
+
 Agda knows how to
 compute the value of `2 + 3`, and so can immediately
 check it is the same as `5`.  A binary relation is said to be _reflexive_
@@ -457,7 +455,6 @@ _ =
     7
   ∎
 ```
-
 
 ## Multiplication
 
@@ -580,8 +577,6 @@ _ = refl
   -- ∎
 ```
 
-
-
 ## Monus
 
 We can also define subtraction.  Since there are no negative
@@ -591,12 +586,14 @@ subtraction to naturals is called _monus_ (a twist on _minus_).
 
 Monus is our first use of a definition that uses pattern
 matching against both arguments:
+
 ```agda
 _∸_ : ℕ → ℕ → ℕ
 m     ∸ zero   =  m
 zero  ∸ suc n  =  zero
 suc m ∸ suc n  =  m ∸ n
 ```
+
 We can do a simple analysis to show that all the cases are covered.
 
   * Consider the second argument.
@@ -611,6 +608,7 @@ founded because monus on bigger numbers is defined in terms of monus
 on smaller numbers.
 
 For example, let's subtract two from three:
+
 ```agda
 _ =
   begin
@@ -623,8 +621,10 @@ _ =
     1
   ∎
 ```
+
 We did not use the second equation at all, but it will be required
 if we try to subtract a larger number from a smaller one:
+
 ```agda
 _ =
   begin
@@ -679,6 +679,7 @@ needs to be declared:
 infixl 6  _+_  _∸_
 infixl 7  _*_
 ```
+
 This states operators `_+_` and `_∸_` have precedence level 6,
 and operator `_*_` has precedence level 7.
 Addition and monus bind less tightly than multiplication
@@ -687,7 +688,6 @@ Writing `infixl` indicates that all three
 operators associate to the left.  One can also write `infixr` to
 indicate that an operator associates to the right, or just `infix` to
 indicate that parentheses are always required to disambiguate.
-
 
 ## Currying
 
@@ -788,7 +788,6 @@ As we can see, the reasoning that justifies inductive and recursive
 definitions is quite similar.  They might be considered two sides of
 the same coin.
 
-
 ## The story of creation, finitely {#finite-creation}
 
 The above story was told in a stratified way.  First, we create
@@ -839,7 +838,6 @@ _(n + 1) × n / 2_ equations about addition.  The number _n_ and all _n_ equatio
 for addition of numbers less than _n_ first appear by day _n+1_ (meaning that we have _1_ *new* number and _n_ *new* equations about addition appearing on Day _n + 1_).
 This gives an entirely finitist view of infinite sets of data and
 equations relating the data.
-
 
 ## Writing definitions interactively
 
@@ -940,7 +938,6 @@ Exploiting interaction to this degree is probably not helpful for a program this
 simple, but the same techniques can help with more complex programs.  Even for
 a program this simple, using `C-c C-c` to split cases can be helpful.
 
-
 ## More pragmas
 
 Including the lines
@@ -960,7 +957,6 @@ and `suc` requires time proportional to the product of _m_ and _n_ to
 multiply _m_ and _n_, whereas representing naturals as integers in
 Haskell requires time proportional to the sum of the logarithms of
 _m_ and _n_.
-
 
 #### Exercise `Bin` (stretch) {#Bin}
 
@@ -1010,7 +1006,6 @@ Confirm that these both give the correct answer for zero through four.
 ```agda
 -- Your code goes here
 ```
-
 
 ## Standard library
 

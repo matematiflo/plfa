@@ -95,9 +95,6 @@ _ : 2 ≤ 4
 _ = s≤s (s≤s z≤n)
 ```
 
-
-
-
 ## Implicit arguments
 
 This is our first use of implicit arguments.  In the definition of
@@ -119,20 +116,26 @@ If we wish, it is possible to provide implicit arguments explicitly by
 writing the arguments inside curly braces.  For instance, here is the
 Agda proof that `2 ≤ 4` repeated, with the implicit arguments made
 explicit:
+
 ```agda
 _ : 2 ≤ 4
 _ = s≤s {1} {3} (s≤s {0} {2} (z≤n {2}))
 ```
+
 One may also identify implicit arguments by name:
+
 ```agda
 _ : 2 ≤ 4
 _ = s≤s {m = 1} {n = 3} (s≤s {m = 0} {n = 2} (z≤n {n = 2}))
 ```
+
 In the latter format, you can choose to only supply some implicit arguments:
+
 ```agda
 _ : 2 ≤ 4
 _ = s≤s {n = 3} (s≤s {n = 2} z≤n)
 ```
+
 It is not permitted to swap implicit arguments, even when named.
 
 We can ask Agda to use the same inference to try and infer an _explicit_ term,
@@ -154,12 +157,12 @@ We declare the precedence for comparison as follows:
 ```agda
 infix 4 _≤_
 ```
+
 We set the precedence of `_≤_` at level 4, so it binds less tightly
 than `_+_` at level 6 and hence `1 + 2 ≤ 3` parses as `(1 + 2) ≤ 3`.
 We write `infix` to indicate that the operator does not associate to
 either the left or right, as it makes no sense to parse `1 ≤ 2 ≤ 3` as
 either `(1 ≤ 2) ≤ 3` or `1 ≤ (2 ≤ 3)`.
-
 
 ## Decidability
 
