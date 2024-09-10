@@ -17,13 +17,13 @@ examples of polymorphic types and higher-order functions.
 import Relation.Binary.PropositionalEquality as Eq
 open Eq using (_≡_; refl; sym; trans; cong)
 open Eq.≡-Reasoning
-open import Data.Bool using (Bool; true; false; T; _∧_; _∨_; not)
-open import Data.Nat using (ℕ; zero; suc; _+_; _*_; _∸_; _≤_; s≤s; z≤n)
+open import Data.Bool.Base using (Bool; true; false; T; _∧_; _∨_; not)
+open import Data.Nat.Base using (ℕ; zero; suc; _+_; _*_; _∸_; _≤_; s≤s; z≤n)
 open import Data.Nat.Properties using
   (+-assoc; +-identityˡ; +-identityʳ; *-assoc; *-identityˡ; *-identityʳ; *-distribʳ-+)
 open import Relation.Nullary using (¬_; Dec; yes; no)
-open import Data.Product using (_×_; ∃; ∃-syntax) renaming (_,_ to ⟨_,_⟩)
-open import Function using (_∘_)
+open import Data.Product.Base using (_×_; ∃; ∃-syntax) renaming (_,_ to ⟨_,_⟩)
+open import Function.Base using (_∘_)
 open import Level using (Level)
 open import plfa.part1.Isomorphism using (_≃_; _⇔_)
 ```
@@ -58,14 +58,18 @@ and `1 ∷ (2 ∷ [])` is a list of the remaining elements, called the
 _tail_. A list is a strange beast: it has a head and a tail,
 nothing in between, and the tail is itself another list!
 
-As we've seen, parameterised types can be translated to
-indexed types. The definition above is equivalent to the following:
+As we've seen, some parameterised types can be translated to
+indexed types. The definition above translates to the following:
 ```agda
-data List′ : Set → Set where
+data List′ : Set → Set₁ where
   []′  : ∀ {A : Set} → List′ A
   _∷′_ : ∀ {A : Set} → A → List′ A → List′ A
 ```
-Each constructor takes the parameter as an implicit argument.
+This is almost equivalent, save that with parametrised types the result
+can be in `Set`, whereas for technical reasons indexed types require the
+result to be `Set₁`.
+
+Each constructor of `List` takes the parameter as an implicit argument.
 Thus, our example list could also be written:
 ```agda
 _ : List ℕ
@@ -648,8 +652,11 @@ For example:
 #### Exercise `foldr-++` (recommended)
 
 Show that fold and append are related as follows:
-
+```agda
+postulate
+  foldr-++ : ∀ {A B : Set} (_⊗_ : A → B → B) (e : B) (xs ys : List A) →
     foldr _⊗_ e (xs ++ ys) ≡ foldr _⊗_ (foldr _⊗_ e ys) xs
+```
 
 ```agda
 -- Your code goes here
@@ -797,12 +804,9 @@ foldr-monoid _⊗_ e ⊗-monoid (x ∷ xs) y =
   ∎
 ```
 
-In a previous exercise we showed the following.
-```agda
-postulate
-  foldr-++ : ∀ {A : Set} (_⊗_ : A → A → A) (e : A) (xs ys : List A) →
+In exercise `foldr-++` above we showed the following:
+
     foldr _⊗_ e (xs ++ ys) ≡ foldr _⊗_ (foldr _⊗_ e ys) xs
-```
 
 As a consequence we can decompose fold over append in a monoid
 into two folds as follows.
@@ -1119,8 +1123,7 @@ import Data.List.Relation.Unary.All using (All; []; _∷_)
 import Data.List.Relation.Unary.Any using (Any; here; there)
 import Data.List.Membership.Propositional using (_∈_)
 import Data.List.Properties
-  using (reverse-++-commute; map-compose; map-++-commute; foldr-++)
-  renaming (mapIsFold to map-is-foldr)
+  using (reverse-++-commute; map-compose; map-++-commute; foldr-++; map-is-foldr)
 import Algebra.Structures using (IsMonoid)
 import Relation.Unary using (Decidable)
 import Relation.Binary using (Decidable)
